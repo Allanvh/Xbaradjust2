@@ -3,7 +3,7 @@ Title: "Esse é o título do meu pacote"
 Version: 0.0.0.9000
 Authors@R: person("Allan", "Hanna", email = "allanhanna7@gmail.com", role = c("aut", "cre"))
 Description: "Meu pacote faz isso aqui ... Descrição"
-Depends: R (>= 3.4.3)
+Depends: R (>= 2.0.1)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

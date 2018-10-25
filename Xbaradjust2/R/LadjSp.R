@@ -19,7 +19,7 @@
 library(cubature)
 
 LadjSp <- function(ARL0nom,m,n) {
-
+library(cubature)
   alpha <- 1/ARL0nom
 
   if (alpha<0.001 || m < 15 || n < 3) {

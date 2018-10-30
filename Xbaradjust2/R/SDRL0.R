@@ -1,4 +1,4 @@
-#' SDRL0
+#' SDRL0Sp
 #'
 #' Valores padrões para testar L=3, m=25, n=5
 #'
@@ -15,7 +15,7 @@
 #' @import cubature
 #'
 
-SDRL0 <- function (L,m,n) {
+SDRL0Sp <- function (L,m,n) {
   library(cubature)
 
   if (L<=0 || L> 5 || m < 25 || n < 5 || m%%1 != 0 || n%%1 != 0 ){

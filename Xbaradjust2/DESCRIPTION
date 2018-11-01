@@ -1,8 +1,8 @@
 Package: Xbaradjust2
-Title: "Esse é o título do meu pacote"
+Title: "Xbarchart with stameted paramether adjustment and performance"
 Version: 0.0.0.9000
 Authors@R: person("Allan", "Hanna", email = "allanhanna7@gmail.com", role = c("aut", "cre"))
-Description: "Meu pacote faz isso aqui ... Descrição"
+Description: "Functions to Xbarchart with stameted paramether adjustment and performance"
 Depends: R (>= 2.0.1)
 License: What license is it under?
 Encoding: UTF-8

@@ -1,6 +1,6 @@
 #' LadjSp
 #'
-#' Essa funcao  ajusta o L
+#' Essa funcao  ajusta o L de uma forma otimizada
 #'
 #'
 #'
@@ -12,25 +12,23 @@
 #'
 #' LadjSp(370,25,5)
 #'
-#' @export cubature
 #' @import cubature
 #'
 
-library(cubature)
 
 LadjSp <- function(ARL0nom,m,n) {
-library(cubature)
-  alpha <- 1/ARL0nom
+  library(cubature)
 
-  if (alpha<0.001 || m < 15 || n < 3) {
-    print(paste("Please revise your entries according to the following conditions:"))
-    print(paste("The nominal in-control ARL must be equal or smaller than 1000"))
-    print(paste("The number (m) of Phase I Samples must be equal or larger than 15"))
-    print(paste("The size (n) of each Phase I Samples must be equal or larger than 3"))
+  if (ARL0nom > 1000 || ARL0nom < 2 || m < 17 || n < 3 || m%%1 != 0 || n%%1 != 0 ) {
+    print(paste("Please, revise your entries according to the following conditions:"))
+    print(paste("The nominal in-control ARL must be between 2 and 1000"))
+    print(paste("The number (m) of Phase I Samples must be equal or larger than 17 and an integer number"))
+    print(paste("The size (n) of each Phase I Samples must be equal or larger than 3 and an integer number"))
   }
   else {
-
-    secant <- function(fun, x0, x1, tol=1e-10, niter=100000){
+    alpha <- 1/ARL0nom
+    Lnom <- (-1*qnorm(alpha/2))
+    secantc <- function(fun, x0, x1, tol=1e-6, niter=100000){
       for ( i in 1:niter ) {
         funx1 <- fun(x1)
         funx0 <- fun(x0)
@@ -40,17 +38,17 @@ library(cubature)
           return(x2)
         }
         if (funx2 < 0)
-          x1 <- x2
-        else
           x0 <- x2
+        else
+          x1 <- x2
       }
       stop("exceeded allowed number of iteractions")
     }
 
-    ARL0XbarSp <- function (alpha1,m,n) {
+    ARL0XbarSp <- function (L,m,n) {
 
       CARL <- function (U) {
-        a <- 1/(1 - pnorm(((1/sqrt(m))*qnorm(U[1],0,1))+((-1*qnorm(alpha1/2))*sqrt(qchisq(U[2],m*(n-1))/(m*(n-1)))),0,1) + pnorm(((1/sqrt(m))*qnorm(U[1],0,1))-((-1*qnorm(alpha1/2))*sqrt(qchisq(U[2],m*(n-1))/(m*(n-1)))),0,1))
+        a <- 1/(1 - pnorm(((1/sqrt(m))*qnorm(U[1],0,1))+(L*sqrt(qchisq(U[2],m*(n-1))/(m*(n-1)))),0,1) + pnorm(((1/sqrt(m))*qnorm(U[1],0,1))-(L*sqrt(qchisq(U[2],m*(n-1))/(m*(n-1)))),0,1))
         return(a)
       }
       a <- adaptIntegrate(CARL, lowerLimit = c(0, 0), upperLimit = c(1, 1))$integral
@@ -58,22 +56,21 @@ library(cubature)
     }
 
     ARLfunc <- function (alphaf) {
-      a <- ARL0XbarSp(alphaf,m,n) - (1/alpha)
+      a <- ARL0XbarSp(alphaf,m,n) - ARL0nom
       return(a)
     }
 
     cat("This may take several minutes. Please, wait... ")
-    s <- secant(ARLfunc,alpha*0.5,alpha*1.5)
+    L <- secantc(ARLfunc,Lnom*0.9,Lnom*1.1)
 
-    L <- (-1*qnorm(s/2))
+    b <- round(ARL0XbarSp(L,m,n),3)
 
-    b <- round(ARL0XbarSp(s,m,n),3)
+    Lround <- round(L,3)
 
     print(paste("End of calculations. See results below:"))
-    print(paste("L = ", L))
-    print(paste("This is the Limit Factor that generates an in-control ARL equal to the specified one for a given m and n for the Xbar chart with Sp estimator"))
-    print(paste("In-Control ARL = E[In-Control RL] = E[In-Control CARL] ", b))
-    return(L)
+    print(paste("L = ", Lround))
+    print(paste("When L = ", Lround, ", m = ", m, "and n = ", n, ", the ARL0 = ", b, ", as specified" ))
+    print(paste("In summary, this function returned the Limit Factor (L) that generates an Unconditional In-control Average Run Length (ARL0) equal to the specified one for the given number (m) and size (n) of Phase I samples for the Xbar chart with Sp estimator."))
+    invisible(L)
   }
 }
-
